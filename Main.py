@@ -10,7 +10,7 @@ clock = pygame.time.Clock()
 running = True
 dt = 0
 background = pygame.image.load("sprites/background.png")
-gravity = 200
+gravity = 500
 font = pygame.font.Font(None, 24)
 
 class Player:
@@ -24,11 +24,15 @@ class Player:
         self.body = pygame.Rect(self.x, self.y, self.w, self.h)
         self.is_jumping = False
         self.is_falling = True
+        self.jumping_force = 1000
+        self.jumping_heigth = 0
+        self.jumping_max_height = 50
 
 
     #def collisionDetection():
 
     def move(self):
+        self.y += gravity * dt
         self.body.x = self.x
         self.body.y = self.y
 
@@ -41,6 +45,13 @@ class Player:
 
     def draw(self):
         screen.blit(self.gfx, (self.x, self.y))
+
+    def jump(self):
+        self.jumping_heigth += 1
+        if self.jumping_heigth <= self.jumping_max_height:
+            self.y -= self.jumping_force * dt + gravity * dt
+            self.jumping_force -= 10
+    
 
     def input(self):
         global debug_mode
@@ -55,7 +66,12 @@ class Player:
             self.x += self.speed * dt
 
         if keys[pygame.K_SPACE]:
-            p1.is_jumping = True
+            self.is_jumping = True
+            self.jump()
+        else:
+            self.is_jumping = False
+            self.jumping_heigth = 0
+            self.jumping_force = 1000
 
         if keys[pygame.K_F1]:
             debug_mode = not debug_mode
